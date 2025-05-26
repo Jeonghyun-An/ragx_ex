@@ -53,22 +53,25 @@ app.post("/chat", async (req, res) => {
                     try {
                         const json = JSON.parse(payload);
                         const delta = json.choices?.[0]?.delta?.content || "";
+                        console.log("🧩 delta:", delta);
+                        console.log("🧩 buffer:", buffer);
+
                         buffer += delta;
 
-                        // if (
-                        //     buffer.includes("<eos>") ||
-                        //     buffer.includes("<end>") ||
-                        //     buffer.includes("</s>")
-                        // ) {
-                        //     const clean = buffer.replace(
-                        //         /<eos>|<end>|<\/s>/g,
-                        //         ""
-                        //     );
-                        //     res.write(`data: ${clean}\n\n`);
-                        //     res.write("event: end\ndata: [DONE]\n\n");
-                        //     res.end();
-                        //     return;
-                        // }
+                        if (
+                            buffer.includes("<eos>") ||
+                            buffer.includes("<end>") ||
+                            buffer.includes("</s>")
+                        ) {
+                            const clean = buffer.replace(
+                                /<eos>|<end>|<\/s>/g,
+                                ""
+                            );
+                            res.write(`data: ${clean}\n\n`);
+                            res.write("event: end\ndata: [DONE]\n\n");
+                            res.end();
+                            return;
+                        }
 
                         res.write(`data: ${delta}\n\n`);
                     } catch (e) {
